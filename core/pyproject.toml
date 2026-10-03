@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "secinsight-core"
+version = "0.1.0"
+description = "Core parsing, scoring, comparison, reporting, and AI-explanation engine for SecInsight AI"
+requires-python = ">=3.10"
+dependencies = [
+    "jinja2>=3.1",
+    "reportlab>=4.0",
+]
+
+[tool.setuptools]
+packages = ["secinsight_core", "secinsight_core.parsers", "secinsight_core.reports"]
+
+[tool.setuptools.package-data]
+"secinsight_core.reports" = ["templates/*.j2"]

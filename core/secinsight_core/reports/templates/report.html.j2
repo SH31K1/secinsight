@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SecInsight AI Report — {{ scan.meta.tool | upper }}</title>
+<style>
+  :root {
+    --critical: #b91c1c; --high: #ea580c; --medium: #ca8a04; --low: #2563eb; --info: #6b7280;
+    --bg: #0f172a; --card: #ffffff; --ink: #111827;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #f3f4f6; color: var(--ink); }
+  header { background: var(--bg); color: white; padding: 32px 40px; }
+  header h1 { margin: 0 0 4px 0; font-size: 24px; }
+  header p { margin: 0; opacity: 0.75; font-size: 14px; }
+  main { max-width: 960px; margin: -24px auto 40px auto; padding: 0 20px; }
+  .card { background: var(--card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 20px; }
+  .score-row { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .score-circle { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700; color: white; background: {{ score_color }}; flex-shrink: 0; }
+  .grade { font-size: 40px; font-weight: 800; color: {{ score_color }}; }
+  .counts { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+  .pill { padding: 6px 14px; border-radius: 999px; color: white; font-size: 13px; font-weight: 600; }
+  .pill.critical { background: var(--critical); } .pill.high { background: var(--high); }
+  .pill.medium { background: var(--medium); } .pill.low { background: var(--low); } .pill.info { background: var(--info); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  th { color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; color: white; font-size: 12px; font-weight: 600; }
+  .badge.critical { background: var(--critical); } .badge.high { background: var(--high); }
+  .badge.medium { background: var(--medium); } .badge.low { background: var(--low); } .badge.info { background: var(--info); }
+  .muted { color: #6b7280; font-size: 13px; }
+  h2 { font-size: 18px; margin-top: 0; }
+  .rec { color: #065f46; background: #d1fae5; padding: 6px 10px; border-radius: 6px; font-size: 13px; margin-top: 4px; display: inline-block; }
+  footer { text-align: center; color: #9ca3af; font-size: 12px; padding: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SecInsight AI — Security Report</h1>
+  <p>Tool: {{ scan.meta.tool | upper }} &middot; Target: {{ scan.meta.target or "N/A" }} &middot; Generated {{ generated_at }}</p>
+</header>
+<main>
+  <div class="card">
+    <div class="score-row">
+      <div class="score-circle">{{ score.score }}</div>
+      <div>
+        <div class="grade">{{ score.grade }}</div>
+        <div class="muted">Security Score</div>
+      </div>
+      <div style="flex:1; min-width: 200px;">
+        <p>{{ score.summary }}</p>
+      </div>
+    </div>
+    <div class="counts">
+      {% for sev in ["critical","high","medium","low","info"] %}
+      <span class="pill {{ sev }}">{{ sev | capitalize }}: {{ score.counts.get(sev, 0) }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if mode == "student" %}
+  <div class="card">
+    <h2>What does this mean?</h2>
+    <p>This report was generated in <strong>Student Mode</strong>, meaning explanations are written in plain
+    English. A <strong>Critical</strong> or <strong>High</strong> finding means an attacker could likely break in
+    or steal data — fix these first. <strong>Medium</strong> and <strong>Low</strong> findings are still worth fixing
+    but are less urgent. <strong>Informational</strong> items are just useful context, not vulnerabilities.</p>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <h2>Findings ({{ scan.findings | length }})</h2>
+    <table>
+      <thead>
+        <tr><th>Severity</th><th>Title</th><th>Host</th><th>Detail</th></tr>
+      </thead>
+      <tbody>
+      {% for f in findings %}
+        <tr>
+          <td><span class="badge {{ f.severity }}">{{ f.severity | upper }}</span></td>
+          <td><strong>{{ f.title }}</strong>{% if f.cve %}<div class="muted">{{ f.cve }}</div>{% endif %}</td>
+          <td>{{ f.host or "—" }}{% if f.port %}:{{ f.port }}{% endif %}{% if f.path %}<div class="muted">{{ f.path }}</div>{% endif %}</td>
+          <td>
+            {{ f.description or "—" }}
+            {% if f.recommendation %}<div class="rec">Fix: {{ f.recommendation }}</div>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if ai_summary_text %}
+  <div class="card">
+    <h2>AI Summary</h2>
+    <p style="white-space: pre-line;">{{ ai_summary_text }}</p>
+  </div>
+  {% endif %}
+</main>
+<footer>Generated by SecInsight AI &middot; secinsight.dev</footer>
+</body>
+</html>

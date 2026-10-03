@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<nmaprun scanner="nmap" args="nmap -oX nmap.xml -sV target" start="1700000000" startstr="Fri Jul 18 10:00:00 2026" version="7.94">
+<host starttime="1700000000" endtime="1700000010">
+<status state="up" reason="syn-ack"/>
+<address addr="192.168.1.10" addrtype="ipv4"/>
+<hostnames><hostname name="testbox.local" type="PTR"/></hostnames>
+<ports>
+<port protocol="tcp" portid="22"><state state="open" reason="syn-ack"/><service name="ssh" product="OpenSSH" version="8.9"/></port>
+<port protocol="tcp" portid="80"><state state="open" reason="syn-ack"/><service name="http" product="nginx" version="1.18.0"/></port>
+<port protocol="tcp" portid="445"><state state="open" reason="syn-ack"/><service name="microsoft-ds" product="Samba"/></port>
+<port protocol="tcp" portid="3306"><state state="open" reason="syn-ack"/><service name="mysql" product="MySQL" version="5.7.30"/>
+<script id="mysql-vuln-cve2012-2122" output="VULNERABLE: CVE-2012-2122 auth bypass"/>
+</port>
+</ports>
+</host>
+</nmaprun>

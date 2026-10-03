@@ -1,0 +1,11 @@
+- Nikto v2.5.0
++ Target IP: 10.0.0.5
++ Target Hostname: example.local
++ Target Port: 80
++ Start Time: 2026-07-18 10:00:00
++ Server: nginx/1.18.0
++ /admin/: Admin login page found. This might be interesting.
++ /backup.zip: A backup archive was found which may contain sensitive files. Outdated.
++ 7915 requests: 0 error(s) and 2 item(s) reported on remote host
++ End Time: 2026-07-18 10:05:00
++ 1 host(s) tested

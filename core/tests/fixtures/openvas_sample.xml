@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<report>
+  <results>
+    <result>
+      <name>OpenSSH weak encryption algorithms supported</name>
+      <host>10.0.0.5</host>
+      <port>22/tcp</port>
+      <threat>Medium</threat>
+      <description>The remote OpenSSH server supports weak encryption algorithms.</description>
+      <nvt oid="1.3.6.1.4.1.25623.1.0.1">
+        <cve>NOCVE</cve>
+        <cvss_base>5.0</cvss_base>
+        <solution>Disable weak ciphers in sshd_config.</solution>
+      </nvt>
+    </result>
+  </results>
+</report>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<issues burpVersion="2024.1" exportTime="Thu Jul 18 10:00:00 GMT 2026">
+  <issue>
+    <serialNumber>1</serialNumber>
+    <type>0x00100200</type>
+    <name>SQL injection</name>
+    <host ip="10.0.0.5">http://10.0.0.5</host>
+    <path>/login</path>
+    <location>/login</location>
+    <severity>High</severity>
+    <confidence>Certain</confidence>
+    <issueBackground>&lt;p&gt;SQL injection allows an attacker to interfere with database queries.&lt;/p&gt;</issueBackground>
+    <remediationBackground>&lt;p&gt;Use parameterized queries.&lt;/p&gt;</remediationBackground>
+    <issueDetail>&lt;p&gt;The value of the username parameter is used in a SQL query.&lt;/p&gt;</issueDetail>
+  </issue>
+  <issue>
+    <serialNumber>2</serialNumber>
+    <type>0x00400200</type>
+    <name>Cookie without HttpOnly flag</name>
+    <host ip="10.0.0.5">http://10.0.0.5</host>
+    <path>/</path>
+    <location>/</location>
+    <severity>Low</severity>
+    <confidence>Firm</confidence>
+    <issueBackground>&lt;p&gt;Cookies without HttpOnly can be read by client-side scripts.&lt;/p&gt;</issueBackground>
+    <remediationBackground>&lt;p&gt;Set the HttpOnly flag.&lt;/p&gt;</remediationBackground>
+    <issueDetail>&lt;p&gt;Session cookie lacks HttpOnly.&lt;/p&gt;</issueDetail>
+  </issue>
+</issues>

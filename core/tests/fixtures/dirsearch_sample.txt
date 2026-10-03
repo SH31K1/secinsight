@@ -1,0 +1,6 @@
+# Dirsearch started
+Target: http://10.0.0.5/
+
+[10:23:45] 200 -    1KB - /admin/
+[10:23:46] 403 -  278B  - /server-status
+[10:23:47] 200 -  512B  - /config.php
