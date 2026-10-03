@@ -1,109 +1,470 @@
 # SecInsight AI
 
-SecInsight AI turns raw output from security scanners into normalized findings,
-security scores, human-readable explanations, and shareable reports — via a
-CLI, a REST API, and a React dashboard.
+**SecInsight AI** is a security-scan analysis platform that converts raw output from security tools into normalized findings, severity scores, risk analysis, explanations, comparisons, and shareable reports.
 
-## Components
+It provides:
 
-| Component | Location | Stack |
-|---|---|---|
-| Core engine | `core/` | Python — parsers, scoring, comparison, AI explanations, report rendering |
-| CLI | `cli/` | Python (Typer + Rich) |
-| Backend API | `backend/` | FastAPI + SQLAlchemy + PostgreSQL |
-| Frontend | `frontend/` | React + TypeScript + Tailwind + Recharts |
+- 🖥️ CLI for security-scan analysis
+- 🌐 REST API with FastAPI
+- 📊 React dashboard
+- 🔍 Support for 8 security scanners
+- 📈 Security scoring and severity analysis
+- 🔄 Scan comparison
+- 🤖 Local AI-style explanations and remediation
+- 📄 PDF, HTML, Markdown, and JSON reports
+- 🧪 Automated test suite
 
-## Supported scanners
+> **Project status:** Active development
 
-Nmap, Nikto, Burp Suite, OWASP ZAP, Nessus, OpenVAS, Gobuster, Dirsearch.
+---
 
-## Quick start (Docker)
+## Supported Security Tools
+
+SecInsight AI currently supports:
+
+| Security Tool | Input |
+|---|---|
+| Nmap | XML |
+| Nikto | TXT |
+| Burp Suite | XML |
+| OWASP ZAP | XML / JSON |
+| Nessus | XML |
+| OpenVAS | XML |
+| Gobuster | TXT |
+| Dirsearch | TXT |
+
+---
+
+## Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │   Security Scans    │
+                    │ Nmap / ZAP / Burp   │
+                    │ Nessus / Nikto ...  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │  SecInsight Core    │
+                    │                     │
+                    │ Parsers             │
+                    │ Findings            │
+                    │ Severity            │
+                    │ Scoring             │
+                    │ Comparison          │
+                    │ AI explanations     │
+                    │ Report generation   │
+                    └───────┬─────┬───────┘
+                            │     │
+                  ┌─────────┘     └─────────┐
+                  ▼                         ▼
+          ┌───────────────┐        ┌────────────────┐
+          │      CLI      │        │   REST API     │
+          │ Typer + Rich  │        │ FastAPI        │
+          └───────────────┘        └───────┬────────┘
+                                           │
+                                           ▼
+                                  ┌────────────────┐
+                                  │ React Dashboard│
+                                  │ TypeScript      │
+                                  │ Tailwind        │
+                                  │ Recharts        │
+                                  └────────────────┘
+```
+
+### Project structure
+
+```text
+secinsight/
+├── core/                 # Parsing, scoring, comparison, reports, AI
+├── cli/                  # Command-line interface
+├── backend/              # FastAPI backend
+├── frontend/             # React dashboard
+├── docs/                 # Architecture and API documentation
+├── Makefile
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## Features
+
+### Scan Analysis
+
+Automatically parse supported security-tool output and normalize it into a common finding model.
+
+```bash
+secinsight analyze nmap.xml --pretty
+```
+
+### Severity Analysis
+
+Findings are categorized into:
+
+```text
+CRITICAL
+HIGH
+MEDIUM
+LOW
+INFO
+```
+
+### Security Scoring
+
+Each scan receives a normalized security score and grade based on its findings.
+
+### Filtering
+
+Filter results from the command line:
+
+```bash
+secinsight analyze scan.xml --filter "severity>=high"
+```
+
+Other examples include:
+
+```text
+severity>=critical
+severity>=high
+host=10.0.0.5
+```
+
+### Scan Comparison
+
+Compare two scan results:
+
+```bash
+secinsight compare old.json new.json --pretty
+```
+
+### Reports
+
+Generate reports in multiple formats:
+
+```bash
+secinsight analyze nmap.xml --pdf
+secinsight analyze nmap.xml --html
+secinsight analyze nmap.xml --json
+secinsight analyze nmap.xml --markdown
+```
+
+### Risk Analysis
+
+Analyze potentially dangerous services and hosts:
+
+```bash
+secinsight analyze nmap.xml --risk
+```
+
+### Explanations
+
+Get explanations for individual findings:
+
+```bash
+secinsight analyze zap.xml --explain
+```
+
+### Student / Professional Modes
+
+Student-friendly output:
+
+```bash
+secinsight analyze nikto.txt --student
+```
+
+Professional output:
+
+```bash
+secinsight analyze nikto.txt --pro
+```
+
+### AI-style Analysis
+
+SecInsight includes a deterministic local generator by default:
+
+```bash
+secinsight analyze zap.xml --ai-summary
+secinsight analyze zap.xml --ai-fix
+```
+
+For richer generated prose, an `ANTHROPIC_API_KEY` can optionally be provided through the environment.
+
+No API key is required for the default local generator.
+
+---
+
+## CLI
+
+Install the core and CLI packages:
+
+```bash
+pip install -e core -e cli
+```
+
+Check supported tools:
+
+```bash
+secinsight tools
+```
+
+Analyze a scan:
+
+```bash
+secinsight analyze scan.xml --pretty
+```
+
+Useful options:
+
+| Option | Description |
+|---|---|
+| `--pretty` | Formatted terminal output |
+| `--summary` | Show only score and summary |
+| `--full` | Show complete finding details |
+| `--student` | Beginner-friendly explanations |
+| `--pro` | Professional output |
+| `--pdf` | Generate PDF report |
+| `--html` | Generate HTML report |
+| `--json` | Generate JSON report |
+| `--markdown` | Generate Markdown report |
+| `--score` | Show only the numeric score |
+| `--risk` | Analyze risky services |
+| `--explain` | Explain findings |
+| `--story` | Generate an attack-path narrative |
+| `--graph` | Generate severity chart |
+| `--timeline` | Show scan score history |
+| `--filter` | Filter findings |
+| `--ai-summary` | Generate AI-style summary |
+| `--ai-fix` | Generate remediation guidance |
+| `--tool` | Force a specific parser |
+| `--output-dir` | Set report output directory |
+
+---
+
+## Docker Quick Start
+
+Build and start the complete stack:
 
 ```bash
 docker compose up --build
 ```
 
-- Frontend: http://localhost:8080
-- Backend API docs: http://localhost:8000/docs
-- Postgres: localhost:5432 (user/pass: `secinsight`/`secinsight`)
+After startup:
 
-## Quick start (local dev)
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:8080 |
+| Backend API | http://localhost:8000 |
+| API documentation | http://localhost:8000/docs |
+| PostgreSQL | localhost:5432 |
+
+### PostgreSQL password
+
+Docker Compose supports an environment variable:
+
+```bash
+export POSTGRES_PASSWORD="your-local-password"
+docker compose up --build
+```
+
+If no password is supplied, the development fallback configured in `docker-compose.yml` is used.
+
+**Do not use development credentials for production deployments.**
+
+---
+
+## Local Development
+
+Install dependencies:
 
 ```bash
 make install
-
-# Terminal 1
-make run-backend      # http://localhost:8000
-
-# Terminal 2
-make run-frontend      # http://localhost:5173
 ```
 
-By default the backend uses PostgreSQL (`DATABASE_URL`); for a zero-setup
-local run you can instead export `DATABASE_URL=sqlite:///./dev.db` before
-`make run-backend`.
-
-## CLI usage
+Start the backend:
 
 ```bash
-pip install -e core -e cli
-
-secinsight analyze nmap.xml --pretty
-secinsight analyze nikto.txt --student --pdf
-secinsight analyze zap.xml --pro --full --risk --explain
-secinsight analyze burp.xml --json --output-dir ./out
-secinsight compare old.json new.json --pretty
-secinsight tools
+make run-backend
 ```
 
-### Flags
+Backend:
 
-| Flag | Description |
-|---|---|
-| `--pretty` | Colorized, formatted terminal output |
-| `--summary` | Only the score/summary, no findings |
-| `--full` | All findings with full detail |
-| `--student` | Beginner-friendly explanations |
-| `--pro` | Concise professional output (default) |
-| `--pdf` / `--html` / `--json` / `--markdown` | Export a report |
-| `--score` | Print only the numeric score |
-| `--risk` | Risk analysis (by host, dangerous services) |
-| `--explain` | Explain each finding |
-| `--compare` | (via `secinsight compare`) diff two JSON scans |
-| `--story` | Narrate a plausible attack path |
-| `--graph` | PNG chart of severity counts |
-| `--timeline` | Score history for this tool/target |
-| `--filter` | Query findings, e.g. `severity>=high`, `host=10.0.0.5` |
-| `--ai-summary` | AI-style narrative summary |
-| `--ai-fix` | AI-style remediation plan |
-| `--tool` | Force a parser instead of auto-detecting |
-| `--output-dir` | Where exported reports are written |
+```text
+http://localhost:8000
+```
 
-`--ai-summary`/`--ai-fix` run a deterministic local generator by default;
-set `ANTHROPIC_API_KEY` to have them call the real Claude API for richer prose
-(see `core/secinsight_core/ai.py::generate_with_claude`).
+Start the frontend in another terminal:
+
+```bash
+make run-frontend
+```
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+### SQLite development mode
+
+For a zero-setup local backend, SQLite can be used instead of PostgreSQL:
+
+```bash
+export DATABASE_URL=sqlite:///./dev.db
+make run-backend
+```
+
+---
 
 ## Testing
 
+Run the complete Python test suite:
+
 ```bash
-make test           # core + cli + backend
+make test
 ```
 
-42 tests across the three Python packages (parsers for all 8 tools, scoring,
-comparison, filtering, report rendering, and the full FastAPI surface).
+The test suite covers:
 
-## Architecture notes
+- Core domain models
+- Scanner parsers
+- Severity mapping
+- Security scoring
+- Finding filters
+- Scan comparison
+- Report generation
+- CLI behavior
+- FastAPI endpoints
 
-- **`secinsight_core`** is the single source of truth for the domain model
-  (`ScanResult`/`Finding`), parsing, scoring, diffing, AI text generation, and
-  report rendering (PDF via ReportLab, HTML via Jinja2, Markdown natively).
-  Both the CLI and the backend import it — there is no duplicated logic.
-- **CLI** additionally keeps a local `~/.secinsight/history.jsonl` so
-  `--timeline` works standalone without the database.
-- **Backend** persists every analyzed scan (`ScanRecord`) and generated report
-  (`ReportRecord`) in Postgres, and exposes score/risk/explain/AI/compare/report
-  endpoints consumed by the React app.
-- **Frontend** has a Dashboard (aggregate trend + recent scans), a scan detail
-  view (findings, AI actions, report export), Charts, a Reports generator, and
-  a Compare view — all driven by a Student/Professional mode toggle that's
-  passed straight through to the backend's report/explain endpoints.
+---
+
+## API
+
+FastAPI documentation is available when the backend is running:
+
+```text
+http://localhost:8000/docs
+```
+
+Additional API documentation is available in:
+
+```text
+docs/api-reference.md
+```
+
+---
+
+## Configuration
+
+Common environment variables include:
+
+```text
+DATABASE_URL
+CORS_ORIGINS
+UPLOAD_DIR
+REPORTS_DIR
+ANTHROPIC_API_KEY
+POSTGRES_PASSWORD
+```
+
+Keep secrets such as API keys and production database passwords outside the repository.
+
+A local `.env` file can be used for development, but it should never be committed.
+
+---
+
+## Security Notice
+
+SecInsight AI is intended for **authorized security testing, defensive analysis, education, and research**.
+
+Only analyze systems and security-scan results that you are authorized to test.
+
+The project does not provide authorization to scan third-party systems.
+
+---
+
+## Documentation
+
+Additional documentation:
+
+```text
+docs/
+├── architecture.md
+└── api-reference.md
+```
+
+---
+
+## Tech Stack
+
+### Core
+
+- Python
+- XML / JSON / text parsers
+- ReportLab
+- Jinja2
+
+### CLI
+
+- Python
+- Typer
+- Rich
+
+### Backend
+
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Alembic
+- Pydantic
+
+### Frontend
+
+- React
+- TypeScript
+- Tailwind CSS
+- Recharts
+- Vite
+
+### Infrastructure
+
+- Docker
+- Docker Compose
+
+---
+
+## License
+
+Add your chosen open-source license before publishing the project.
+
+For example, you can add an `MIT License` or another license appropriate for your project.
+
+---
+
+## Contributing
+
+Contributions, bug reports, parser improvements, documentation updates, and feature ideas are welcome.
+
+Before submitting a pull request:
+
+```bash
+make test
+```
+
+Please do not include:
+
+- API keys
+- passwords
+- private keys
+- real authentication tokens
+- confidential scan results
+- sensitive customer data
+
+---
+
+## Author
+
+**SecInsight AI**
+
+Built as a security-analysis and learning project combining scanner parsing, normalization, scoring, reporting, and web-based visualization.
